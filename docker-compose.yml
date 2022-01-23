@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+ prometheus:
+      image: prom/prometheus:latest
+      ports:
+      - 9090:9090
+      volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+ app:
+      image: app:latest
+      container_name: app
+      build:
+        context: .
+        dockerfile: Dockerfile
+      ports:
+      - 5000:5000
+      volumes:
+      - .:/app
+
+ grafana:
+   image: grafana/grafana:3.0.0-beta7
+   environment:
+     - GF_SECURITY_ADMIN_PASSWORD=pass
+   depends_on:
+     - prometheus
+   ports:
+     - 3000:3000
+   volumes:
+     - grafana_data:/var/lib/grafana
+
+volumes:
+  prometheus_data:
+  grafana_data:
